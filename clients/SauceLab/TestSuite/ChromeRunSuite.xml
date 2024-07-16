@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SauceLab" parallel="tests" thread-count="2">
+	<listeners>
+		<listener class-name="org.uncommons.reportng.HTMLReporter" />
+		<listener class-name="configuration.BaseTest" />
+	</listeners>
+	<parameter name="Browser" value="chrome"/>
+	<parameter name="Client" value="SauceLab"/>
+	<test name="LoginWithCorrectCredentials">
+		<classes>
+			<class name="testCases.LoginWithCorrectCredentials" />
+		</classes> 
+	</test>
+	<test name="LoginWithInCorrectUsername">
+		<classes>
+			<class name="testCases.LoginWithInCorrectUsername" />
+		</classes>
+	</test>
+</suite> 

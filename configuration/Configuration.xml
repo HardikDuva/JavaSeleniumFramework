@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<FrameworkConfiguration>
+	<Configuration>
+		<ImplicitTimeout>60</ImplicitTimeout>
+		<SERVER_URL>http://localhost:4444</SERVER_URL>
+		<PRODUCT_URL>https://www.saucedemo.com</PRODUCT_URL>
+	</Configuration>
+</FrameworkConfiguration>
