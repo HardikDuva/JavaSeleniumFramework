@@ -22,23 +22,16 @@ import java.util.*;
 public class BaseDriver {
 
 	public WebDriver driver = null;
-	private final Browsers browser;
-	private MutableCapabilities options = null;
 	private final long limit;
 	private String mainWindowHandle = null;
 	protected Wait<WebDriver> newWait;
 
-	public enum Browsers {
-		FIREFOX, EDGE, CHROME
-	}
-
-	public BaseDriver(String browser,String serverURL, long newWaitImplicit) {
-		this.browser = parseBrowser(browser);
+	public BaseDriver(WebDriver driver, long newWaitImplicit) {
+		this.driver = driver;
 		this.limit = newWaitImplicit;
-
 		this.newWait = setWait();
-		this.options = parseMutableCapabilities();
-		loadWebDriverObject(serverURL);
+		mainWindowHandle = driver
+				.getWindowHandle();
 	}
 
 	/**
@@ -52,102 +45,6 @@ public class BaseDriver {
 				.ignoring(TimeoutException.class)
 				.ignoring(InvalidElementStateException.class);
 		return newWait;
-	}
-
-	/**
-	 * Parse Browser
-	 * @param browserStr - The browser name
-	 */
-	public Browsers parseBrowser(String browserStr) {
-		Browsers browser;
-		List<String> ffKeys = new ArrayList<>();
-		ffKeys.add("firefox");
-		ffKeys.add("ff");
-		ffKeys.add("Firefox");
-		ffKeys.add("MozilaFirefox");
-		ffKeys.add("Mozilafirefox");
-		ffKeys.add("mozilafirefox");
-
-		List<String> edgeKeys = new ArrayList<>();
-		edgeKeys.add("edge");
-		edgeKeys.add("Edge");
-		edgeKeys.add("MicrosoftEdge");
-
-		List<String> chromeKeys = new ArrayList<>();
-		chromeKeys.add("googlechrome");
-		chromeKeys.add("chrome");
-		chromeKeys.add("Chrome");
-
-		if (ffKeys.contains(browserStr)) {
-			browser = Browsers.FIREFOX;
-		}
-		else if (edgeKeys.contains(browserStr)) {
-			browser = Browsers.EDGE;
-		}else if (chromeKeys.contains(browserStr)) {
-			browser = Browsers.CHROME;
-		} else {
-			browser = Browsers.CHROME;
-		}
-
-		
-		return browser;
-	}
-
-	/**
-	 * Set Mutable Capabilities
-	 */
-	public MutableCapabilities parseMutableCapabilities() {
-		MutableCapabilities option = null;
-		switch (this.browser.toString()) {
-			case "FIREFOX" -> option = new FirefoxOptions();
-			case "CHROME" -> option = new ChromeOptions();
-			case "EDGE" -> option = new EdgeOptions();
-		}
-
-		if (null != option) {
-			option = option.merge(option);
-		}
-
-		return option;
-	}
-
-	/**
-	 * Load Web Driver Object
-	 */
-	private void loadWebDriverObject(String serverURL) {
-		try {
-			if (null != this.options) {
-				driver = new RemoteWebDriver(new URL(serverURL), this.options);
-			}
-			else {
-				Assert.fail("Web-Driver is not initialized.");
-			}
-
-		} catch (MalformedURLException e) {
-			System.err.println("\nMalformed URL Exception while connecting to the Selenium GRID Hub\n" + e.getMessage());
-		} catch (SessionNotCreatedException e) {
-			System.err.println("Selenium Grid was unable to create a session using the following capabilities: \n"
-					+ "BrowserName = " + browser);
-		}
-
-		driver.manage()
-				.timeouts()
-				.pageLoadTimeout(Duration.ofSeconds(limit));
-		driver.manage()
-				.timeouts()
-				.implicitlyWait(Duration.ofSeconds(limit));
-		driver.manage()
-				.timeouts()
-				.scriptTimeout(
-						Duration.ofSeconds(limit));
-
-		mainWindowHandle = driver
-				.getWindowHandle();
-
-		driver.manage()
-				.window()
-				.maximize();
-
 	}
 
 	public void changeStyleAttrWithElementID(String elementID, String TagName, String newValue) {

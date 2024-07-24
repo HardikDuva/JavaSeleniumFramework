@@ -11,8 +11,7 @@ import org.testng.Assert;
 public class LogInPage extends AbstractionPOM {
 
     public LogInPage(BaseDriver baseDriver,ExtentTest test) {
-        super(baseDriver);
-        this.test = test;
+        super(baseDriver,test);
     }
 
     @FindBy(xpath = "//div[@class=\"login-box\"]//input[@id=\"user-name\"]")

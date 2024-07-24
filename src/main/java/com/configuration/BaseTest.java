@@ -8,6 +8,7 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.utilities.*;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.testng.*;
 import org.testng.annotations.*;
 import com.pages.LogInPage;
@@ -29,7 +30,7 @@ public class BaseTest {
 	public static ExtentReports extent;
 	protected ExtentTest test;
 
-	@BeforeSuite
+    @BeforeSuite
 	@Parameters({"Browser" , "Client"})
 	public void setConfiguration(String brw,String client) {
 		this.browser = brw;
@@ -68,7 +69,10 @@ public class BaseTest {
 
 		// Open browser
 		try {
-			baseDriver = new BaseDriver(browser, SERVER_URL,WAIT_STANDARD);
+            RemoteWebDriver remoteWebDriver = new RemoteWebDriver(browser, SERVER_URL);
+			WebDriver driver = remoteWebDriver.launchBrowser();
+
+			baseDriver = new BaseDriver(driver,WAIT_STANDARD);
 			baseDriver.gotoUrl(PRODUCT_URL);
 
 		} catch (Exception e) {
@@ -91,10 +95,6 @@ public class BaseTest {
 		}
 	}
 
-	public LogInPage ObLogIn() {
-		return new LogInPage(baseDriver,test);
-	}
-
 	protected void infoLog(ExtentTest test, String msg) {
 		test.log(Status.INFO, msg);
 	}
@@ -104,7 +104,7 @@ public class BaseTest {
 		Assert.fail(msg);
 	}
 
-	public void sendEmail() {
+	private void sendEmail() {
 		//Send Report
 		EmailConnector emailConnector = new EmailConnector();
 		String subject = "Execution Report for the client " + clientName;

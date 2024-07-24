@@ -1,13 +1,12 @@
 package com.testCases;
 
-import com.configuration.BaseTest;
-import com.utilities.UserDetailsConfig;
+import com.configuration.ObjectRepo;
 
 import org.testng.annotations.Test;
 
 import static com.utilities.TestDataConstants.*;
 
-public class LoginWithCorrectCredentials extends BaseTest {
+public class LoginWithCorrectCredentials extends ObjectRepo {
 
 	@Test
 	public void LoginInWithCorrectCredential()  {
