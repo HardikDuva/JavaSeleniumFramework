@@ -1,18 +1,18 @@
-package pages;
+package com.pages;
 
-import configuration.BaseDriver;
-import configuration.BaseTest;
+import com.aventstack.extentreports.ExtentTest;
+import com.configuration.AbstractionPOM;
+import com.configuration.BaseDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import org.testng.Assert;
 
-import java.util.List;
+public class LogInPage extends AbstractionPOM {
 
-public class LogInPage extends AbstractionPOM{
-
-    public LogInPage(BaseDriver baseDriver) {
+    public LogInPage(BaseDriver baseDriver,ExtentTest test) {
         super(baseDriver);
+        this.test = test;
     }
 
     @FindBy(xpath = "//div[@class=\"login-box\"]//input[@id=\"user-name\"]")
@@ -29,10 +29,11 @@ public class LogInPage extends AbstractionPOM{
      */
     public LogInPage enterUsername(String userName) {
         try {
+            infoLog(test,"Enter Username :" + userName);
             baseDriver.waitForElementVisible(usernameInputEle);
             baseDriver.inputText(usernameInputEle,userName);
         } catch (Exception e) {
-            Assert.fail("Username field is not editable");
+            errorLog(test,"Username field is not editable");
         }
         return this;
     }
@@ -42,10 +43,11 @@ public class LogInPage extends AbstractionPOM{
      */
     public LogInPage enterPassword(String password) {
         try {
+            infoLog(test,"Enter Password :" + password);
             baseDriver.waitForElementVisible(passwordInputEle);
             baseDriver.inputText(passwordInputEle,password);
         } catch (Exception e) {
-            Assert.fail("Password field is not editable");
+            errorLog(test,"Password field is not editable");
         }
         return this;
     }
@@ -55,19 +57,20 @@ public class LogInPage extends AbstractionPOM{
      */
     public LogInPage clickOnLoginInButton() {
         try {
+            infoLog(test,"Click on Login Button");
             baseDriver.clickAndWait(loginButtonClickEle);
         } catch (Exception e) {
-            Assert.fail("Login Button field is not clickable");
+            errorLog(test,"Login Button field is not clickable");
         }
-
         return this;
     }
 
     /**
-     * Checks if user Logged In
+     * Get current page URL
      */
     //will Navigate to Product URL Page
     public String getPageURL() {
+        infoLog(test,"Get Current Page URL");
         return baseDriver.getCurrentUrl();
     }
 

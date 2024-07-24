@@ -1,4 +1,4 @@
-package configuration;
+package com.utilities;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -28,8 +28,8 @@ public class EmailConnector {
         properties.put("mail.smtp.port", "25");
 
         // Set up the email credentials
-        final String username = "";
-        final String password = "";
+        final String username = FrameworkConfig.get("EMAIL_USERNAME");
+        final String password = FrameworkConfig.get("EMAIL_PASSWORD");
 
         Session session = Session.getInstance(
                 properties, new Authenticator() {

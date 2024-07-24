@@ -1,23 +1,21 @@
-package configuration;
+package com.configuration;
 
-import org.apache.commons.io.FileUtils;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.Augmenter;
 
-import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
+import com.utilities.FileConnector;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 
@@ -29,18 +27,15 @@ public class BaseDriver {
 	private final long limit;
 	private String mainWindowHandle = null;
 	protected Wait<WebDriver> newWait;
-	private final String outputDirectory;
-
-	protected AutoLogger logger = new AutoLogger(BaseTest.class);
 
 	public enum Browsers {
 		FIREFOX, EDGE, CHROME
 	}
 
-	public BaseDriver(String browser,String serverURL, long newWaitImplicit,String outputDir) {
+	public BaseDriver(String browser,String serverURL, long newWaitImplicit) {
 		this.browser = parseBrowser(browser);
 		this.limit = newWaitImplicit;
-		this.outputDirectory = outputDir;
+
 		this.newWait = setWait();
 		this.options = parseMutableCapabilities();
 		loadWebDriverObject(serverURL);
@@ -94,7 +89,7 @@ public class BaseDriver {
 			browser = Browsers.CHROME;
 		}
 
-		logger.i("Browser " + browser + " Initiated");
+		
 		return browser;
 	}
 
@@ -121,22 +116,17 @@ public class BaseDriver {
 	 */
 	private void loadWebDriverObject(String serverURL) {
 		try {
-			logger.i("Initializing webaseDriver");
-
-
 			if (null != this.options) {
-				logger.i("Starting webaseDriver at " + serverURL);
 				driver = new RemoteWebDriver(new URL(serverURL), this.options);
 			}
-
 			else {
-				Assert.fail("MutableCapabilities is not defined");
+				Assert.fail("Web-Driver is not initialized.");
 			}
 
 		} catch (MalformedURLException e) {
-			logger.e("\nMalformed URL Exception while connecting to the Selenium GRID Hub\n" + e.getMessage());
+			System.err.println("\nMalformed URL Exception while connecting to the Selenium GRID Hub\n" + e.getMessage());
 		} catch (SessionNotCreatedException e) {
-			logger.e("Selenium Grid was unable to create a session using the following capabilities: \n"
+			System.err.println("Selenium Grid was unable to create a session using the following capabilities: \n"
 					+ "BrowserName = " + browser);
 		}
 
@@ -191,37 +181,37 @@ public class BaseDriver {
 	}
 
 	public void switchToFrame(WebElement we) {
-		logger.i("switchToFrame");
+		System.out.println("switchToFrame");
 		driver.switchTo().frame(we);
 	}
 
 	public void switchToDefault() {
-		logger.i("switch To Default Frame");
+		System.out.println("switch To Default Frame");
 		driver.switchTo().defaultContent();
 	}
 
 	public void inputTextToiFrame(WebElement we, String expText) {
-		logger.i("inputTextToiFrame");
+		System.out.println("inputTextToiFrame");
 		switchToFrame(we);
 		switchToInnerFrame(we, expText);
 		switchToDefault();
 	}
 
 	public void switchToInnerFrame(WebElement we, String expText) {
-		logger.i("switchToInnerFrame");
+		System.out.println("switchToInnerFrame");
 		we.click();
 		Actions act = new Actions(driver);
 		act.sendKeys(we, expText).build().perform();
 	}
 
 	public void verifyLabelPresentInList(WebElement we, String expLabel) {
-		logger.i("verifyLabelPresentInList");
+		System.out.println("verifyLabelPresentInList");
 		String[] actList = getAllListItems(we);
 		Assert.assertTrue(Arrays.asList(actList).contains(expLabel), "Text" + expLabel + "is not present in list!");
 	}
 
 	public void verifyLabelNotPresentInList(WebElement we, String expLabel) {
-		logger.i("verifyLabelNotPresentInList");
+		System.out.println("verifyLabelNotPresentInList");
 		String[] actList = getAllListItems(we);
 		Assert.assertFalse(Arrays.asList(actList).contains(expLabel), "Text" + expLabel + "is present in list!");
 	}
@@ -235,12 +225,12 @@ public class BaseDriver {
 
 	public void clickAndWait(WebElement we) {
 
-		logger.i("Click On " + we);
+		System.out.println("Click On " + we);
 		clickAndWait(we, true);
 	}
 
 	public void doubleClickAndWait(WebElement we, boolean waitForPageLoad) {
-		logger.i("doubleClickAndWait, newWait?=%s");
+		System.out.println("doubleClickAndWait, newWait?=%s");
 		(new Actions(driver)).doubleClick(we).perform();
 		if (waitForPageLoad) {
 			waitUntilPageIsLoaded();
@@ -253,19 +243,18 @@ public class BaseDriver {
 	}
 
 	public void inputText(WebElement we, String text) {
-		logger.i("inputText, text=%s", text);
 		we.clear();
 		we.sendKeys(text);
 	}
 
 	public void pressTab(WebElement we) {
-		logger.i("pressTab");
+		System.out.println("pressTab");
 		we.click();
 		we.sendKeys(Keys.TAB);
 	}
 
 	public void inputTextAndDefocus(WebElement we, String text) {
-		logger.i("inputTextAndDefocus, text=%s", text);
+		
 		we.clear();
 		we.sendKeys(text);
 		((JavascriptExecutor) driver).executeScript("arguments[0].onblur();", we);
@@ -278,7 +267,7 @@ public class BaseDriver {
 	}
 
 	public void inputTextAndChangefocus(WebElement we, String text) {
-		logger.i("inputTextAndDefocus, text=%s", text);
+		
 		we.clear();
 		we.sendKeys(text);
 		we.sendKeys(Keys.TAB);
@@ -286,31 +275,31 @@ public class BaseDriver {
 	}
 
 	public void sendKey(WebElement we, Keys key) {
-		logger.i("sendkey, key=%s", key.name());
+		
 		we.sendKeys(key);
 		waitUntilPageIsLoaded();
 	}
 
 	public void setText(WebElement we, String text) {
-		logger.i("setText, text=%s", text);
+		
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
 		executor.executeScript("arguments[0].value='" + text + "';", we);
 	}
 
 	public void setInnerHTML(WebElement we, String text) {
-		logger.i("setInnerHTML, text=%s", text);
+		
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
 		executor.executeScript("arguments[0].innerHTML='" + text + "';", we);
 	}
 
 	public void setTextContent(WebElement we, String text) {
-		logger.i("setTextContent, text=%s", text);
+		
 		JavascriptExecutor executor = (JavascriptExecutor) driver;
 		executor.executeScript("arguments[0].textContent='" + text + "';", we);
 	}
 
 	public void waitForDropDownToLoad(final WebElement elementId) {
-		logger.i("waitForDropDownToLoad");
+		System.out.println("waitForDropDownToLoad");
 
 		ExpectedCondition<Boolean> newWaitCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -320,34 +309,34 @@ public class BaseDriver {
 			}
 		};
 		newWait.until(newWaitCondition);
-		
+
 	}
 
-	public void waitForElementToBeClickable(WebElement webElement, int implicitTime) {		
-		logger.i("waitForElementToBeClickable");
+	public void waitForElementToBeClickable(WebElement webElement, int implicitTime) {
+		System.out.println("waitForElementToBeClickable");
 
 		newWait.until(ExpectedConditions.elementToBeClickable(webElement));
 	}
 
 	public void waitForElementState(WebElement webElement, int implicitTime, boolean elementState) {
-		logger.i("waitForElementState");
+		System.out.println("waitForElementState");
 
 		newWait.until(ExpectedConditions.elementSelectionStateToBe(webElement, elementState));
 	}
 
 	public void waitForTextChangeInElement(WebElement we) {
-		logger.i("waitForTextChangeInElement");
+		System.out.println("waitForTextChangeInElement");
 		String actText = getText(we);
 
 		waitForTextNotInElement(we, actText);
 	}
 
 	public void waitForTextNotInElement(WebElement we, String text) {
-		logger.i("waitForTextNotInElement");
+		System.out.println("waitForTextNotInElement");
 
 		newWait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(we, text)));
 
-		
+
 
 	}
 
@@ -357,22 +346,22 @@ public class BaseDriver {
 	}
 
 	public void waitForValueNotInElement(WebElement we, String text) {
-		logger.i("waitForValueNotInElement");
+		System.out.println("waitForValueNotInElement");
 		newWait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElementValue(we, text)));
 	}
 
 	public void waitForTextInElement(WebElement we, String expText) {
-		logger.i("waitForTextInElement");
+		System.out.println("waitForTextInElement");
 		newWait.until(ExpectedConditions.textToBePresentInElement(we, expText));
 	}
 
 	public void waitForTextToBePresentInElement(WebElement we, String expText) {
-		logger.i("waitForTextInElementWithAttribute");
+		System.out.println("waitForTextInElementWithAttribute");
 		newWait.until(ExpectedConditions.textToBePresentInElement(we, expText));
 	}
 
 	public void waitForTextToBePresentInElementWithAttribute(WebElement we, String expText, String attributeName) {
-		logger.i("waitForTextToBePresentInElementWithAttribute");
+		System.out.println("waitForTextToBePresentInElementWithAttribute");
 
 		int attempts = 0;
 		while (attempts < 500) {
@@ -381,19 +370,19 @@ public class BaseDriver {
 					break;
 				}
 			} catch (Exception e) {
-				logger.e(e);
+				System.err.println(e);
 			}
 			attempts++;
 		}
 	}
 
 	public void waitForValueInElement(WebElement we, String expText) {
-		logger.i("waitForValueInElement");
+		System.out.println("waitForValueInElement");
 		newWait.until(ExpectedConditions.textToBePresentInElementValue(we, expText));
 	}
 
 	public void waitForJSCondition(final String jsCondition) {
-		logger.i("waitForJSCondition: %s", jsCondition);
+		
 		ExpectedCondition<Boolean> newWaitCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
 				Object ret = ((JavascriptExecutor) driver).executeScript("return " + jsCondition);
@@ -401,46 +390,46 @@ public class BaseDriver {
 			}
 		};
 		newWait.until(newWaitCondition);
-		
+
 	}
 
 	public boolean isVisible(WebElement we) {
-		logger.i("isVisible");
+		System.out.println("isVisible");
 		return we.isDisplayed();
 	}
 
 	public String getCurrentUrl() {
-		logger.i("getCurrentUrl");
+		System.out.println("getCurrentUrl");
 		return driver.getCurrentUrl();
 	}
 
 	public boolean isSelected(WebElement we) {
-		logger.i("isSelected");
+		System.out.println("isSelected");
 		return we.isSelected();
 	}
 
 	public void selectCheckbox(WebElement we) {
-		logger.i("selectCheckbox");
+		System.out.println("selectCheckbox");
 		if (!isSelected(we)) {
-			logger.d("Element not checked, perform click");
+			System.out.println("Element not checked, perform click");
 			clickAndWait(we, false);
 		} else {
-			logger.d("Element already checked, skipping click");
+			System.out.println("Element already checked, skipping click");
 		}
 	}
 
 	public void unselectCheckbox(WebElement we) {
-		logger.i("unselectCheckbox");
+		System.out.println("unselectCheckbox");
 		if (isSelected(we)) {
-			logger.d("Element checked, perform click");
+			System.out.println("Element checked, perform click");
 			clickAndWait(we, false);
 		} else {
-			logger.d("Element already unchecked, skipping click");
+			System.out.println("Element already unchecked, skipping click");
 		}
 	}
 
 	public String getText(WebElement we) {
-		logger.i(we.getText());
+		System.out.println(we.getText());
 		String message = we.getText();
 		return message;
 	}
@@ -450,7 +439,7 @@ public class BaseDriver {
 	}
 
 	public void quit() {
-		logger.i("Driver Quit");
+		System.out.println("Driver Quit");
 		if (driver != null) {
 			driver.quit();
 			driver = null;
@@ -459,90 +448,69 @@ public class BaseDriver {
 
 	public String getTextByAttribute(WebElement we, String attribute) {
 		String message = we.getAttribute(attribute);
-		logger.i("getTextByAttribute=%s", message);
+
 		return message;
 	}
 
 	public void selectByLabel(WebElement we, String label) {
-		logger.i("selectByLabel, label=%s", label);
+
 		Select select = new Select(we);
 		select.selectByVisibleText(label);
 	}
 
 	public void selectByIndex(WebElement we, int index) {
-		logger.i("selectByIndex, index=%s", index);
+
 		Select select = new Select(we);
 		select.selectByIndex(index);
 	}
 
 	public String getSelectedLabel(WebElement we) {
-		logger.i("getSelectedLabel");
+		System.out.println("getSelectedLabel");
 		Select select = new Select(we);
 		String actLabel = select.getFirstSelectedOption().getText();
-		logger.d("getSelectedLabel, actualLabel=%s", actLabel);
+
 		return actLabel;
 	}
 
 	public void verifySelectedLabel(WebElement we, String expLabel) {
-		logger.i("verifySelectedLabel, expLabel=%s", expLabel);
+
 		String actLabel = getSelectedLabel(we);
 
 		Assert.assertEquals(actLabel, expLabel, "Selected label mismatch!");
 	}
 
 	public void verifyText(WebElement we, String expText) {
-		logger.i("verifyText");
+		System.out.println("verifyText");
 		String actText = getText(we);
 		Assert.assertEquals(actText, expText, "Element text mismatch!");
 	}
 
 	public void verifyTextNotInElement(WebElement we, String expText) {
-		logger.i("verifyTextNotInElement");
+		System.out.println("verifyTextNotInElement");
 		String actText = getText(we);
 		Assert.assertNotEquals(actText, expText, "Element text mismatch!");
 	}
 
 	public String getValue(WebElement we) {
-		logger.i("getValue");
+		System.out.println("getValue");
 		String actValue = we.getAttribute("value");
-		logger.d("getValue=%s", actValue);
+
 		return actValue;
 	}
 
 	public void verifyValue(WebElement we, String expValue) {
-		logger.i("verifyValue");
+		System.out.println("verifyValue");
 		String actValue = getValue(we);
 		Assert.assertEquals(actValue, expValue, "Element value mismatch!");
 	}
 
-	public void captureScreenshot(String fileSuffix) {
+	public void captureFailTestScreenshot(ExtentTest test,String msg) {
 		try {
-			String directoryPath = outputDirectory +
-					File.separator + "PassedScreenShot";
-
-			Utilities.createDir(directoryPath);
-			String relativePath = directoryPath + File.separator + fileSuffix + "_.png";
-
-			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			FileUtils.copyFile(screenshot, new File(relativePath));
-
+			String base64Screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BASE64);
+			test.addScreenCaptureFromBase64String(base64Screenshot, msg);
+			test.log(Status.FAIL, msg + ".\n Please find below attached screenshot");
 		} catch (Exception e) {
-			System.err.println("Error while taking screenshot " + e.getMessage());
-		}
-	}
-
-	public void takeFailedScenarioScreenshot(String fileSuffix) {
-		try {
-			String directoryPath = outputDirectory + File.separator + "FailedScreenShot";
-
-			Utilities.createDir(directoryPath);
-			String relativePath = directoryPath + File.separator + fileSuffix + "_.png";
-
-			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			FileUtils.copyFile(screenshot, new File(relativePath));
-
-		} catch (Exception e) {
-			System.err.println("Error while taking screenshot " + e.getMessage());
+			test.log(Status.FAIL, "Error while taking screenshot " + e.getMessage());
 		}
 	}
 
@@ -557,7 +525,7 @@ public class BaseDriver {
 		newWait.until(ExpectedConditions.not(ExpectedConditions.visibilityOf(we)));
 	}
 	public void verifyIsNotVisible(WebElement we) {
-		logger.i("verifyIsNotVisible");
+		System.out.println("verifyIsNotVisible");
 		if (!isVisible(we)) {
 			Assert.assertFalse(isVisible(we), "Element '" + we + "' is found visible!");
 		} else {
@@ -566,33 +534,32 @@ public class BaseDriver {
 	}
 
 	public void verifyIsSelected(WebElement we) {
-		logger.i("verifyIsSelected");
+		System.out.println("verifyIsSelected");
 		Assert.assertTrue(isSelected(we), "Element '" + we + "' is not selected!");
 	}
 
 	public void verifyIsNotSelected(WebElement we) {
-		logger.i("verifyIsNotSelected");
+		System.out.println("verifyIsNotSelected");
 		Assert.assertFalse(isSelected(we), "Element '" + we + "' is found selected!");
 	}
 
 	public void verifyTextBoxNotEmpty(WebElement we) {
-		logger.i("verifyTextBoxNotEmpty");
+		System.out.println("verifyTextBoxNotEmpty");
 		Assert.assertNotSame(we.getAttribute("value"), "", "Element '" + we + "' Text Box is empty ");
 	}
 
 	public void verifyElementTextNotEmpty(WebElement we) {
-		logger.i("verifyElementTextNotEmpty");
+		System.out.println("verifyElementTextNotEmpty");
 		Assert.assertNotSame(we.getText(), "", "Element '" + we + "' Text is empty ");
 	}
 
 	public void scrollBottom() {
-		logger.i("scrollBottom");
+		System.out.println("scrollBottom");
 		((JavascriptExecutor) driver).executeScript(
 				"window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight))");
 	}
 
 	public void alertConfirm(boolean switchBackToMainWindow) {
-		logger.i("alertConfirm: backToMainWaindow=%s", switchBackToMainWindow);
 
 		try {
 			Alert alert = driver.switchTo().alert();
@@ -600,7 +567,7 @@ public class BaseDriver {
 
 			sleep(2000, "Required time to settle down after alert in IE");
 		} catch (Exception e) {
-			logger.e(e);
+			System.err.println(e);
 		}
 
 		if (switchBackToMainWindow) {
@@ -617,7 +584,7 @@ public class BaseDriver {
 		}
 
 		catch (Exception e) {
-			logger.e(e);
+			System.err.println(e);
 		}
 	}
 	public void alertConfirm() {
@@ -625,7 +592,7 @@ public class BaseDriver {
 	}
 
 	public void alertDismiss() {
-		logger.i("alertDismiss");
+		System.out.println("alertDismiss");
 
 		try {
 			Alert alert = driver.switchTo().alert();
@@ -634,14 +601,14 @@ public class BaseDriver {
 			// Required time to settle down after alert in IE
 			sleep(2000, "Required time to settle down after alert in IE");
 		} catch (Exception e) {
-			logger.e(e);
+			System.err.println(e);
 		}
 
 		driver.switchTo().defaultContent();
 	}
 
 	public void switchToNewWindow() {
-		logger.i("switchToNewWindow");
+		System.out.println("switchToNewWindow");
 
 		int trials = 3;
 
@@ -656,38 +623,33 @@ public class BaseDriver {
 		// Switch to new window opened
 		for (String winHandle : windowIds) {
 			if (!winHandle.equals(mainWindowHandle)) {
-				logger.d("Switching to '%s'", winHandle);
+
 				driver.switchTo().window(winHandle);
 			}
 		}
 	}
 
 	public void switchToMainWindow() {
-		logger.i("switchToMainWindow, mainWindowHandle=%s", mainWindowHandle);
-
 		Assert.assertNotNull(mainWindowHandle, "Main Window Handle not initialized!");
 
 		driver.switchTo().window(mainWindowHandle);
 	}
 
 	public void closeWindow() {
-		logger.i("closeWindow");
+		System.out.println("closeWindow");
 
 		driver.close();
 	}
 
 	public void verifyWindowTitle(String title) {
-		logger.i("verifyWindowTitle, expTitle=%s", title);
-
 		String actTitle = getTitle();
-		logger.d("verifyWindowTitle, actTitle=%s", actTitle);
 
 		Assert.assertEquals(actTitle, title, "Window title mismatch!");
 	}
 
 	public void mouseHoverClickOnElement(WebElement ele) {
 		Actions action = new Actions(driver);
-		logger.d("mouseHover And Click On "+ele.getText());
+		System.out.println("mouseHover And Click On "+ele.getText());
 		action.moveToElement(ele).click().build().perform();
 	}
 
@@ -709,12 +671,12 @@ public class BaseDriver {
 	}
 
 	public void dragAndDrop(WebElement sourceWE, WebElement targetWE) {
-		logger.i("dragAndDrop");
+		System.out.println("dragAndDrop");
 		(new Actions(driver)).dragAndDrop(sourceWE, targetWE).perform();
 	}
 
 	public void refreshPage() {
-		logger.i("refreshPage");
+		System.out.println("refreshPage");
 		driver.navigate().refresh();
 	}
 
@@ -728,43 +690,43 @@ public class BaseDriver {
 		try {
 			Thread.sleep(milliseconds);
 		} catch (Exception e) {
-			logger.e(e);
+			System.err.println(e);
 		}
 	}
 
 	public void gotoUrl(String urlAddress) {
-		logger.i("gotoUrl: " + urlAddress);
+		System.out.println("gotoUrl: " + urlAddress);
 		driver.get(urlAddress);
 		waitUntilPageIsLoaded();
 	}
 
 	public void maximizeWindow() {
-		logger.i("Maximize window");
+		System.out.println("Maximize window");
 		driver.manage().window().maximize();
 	}
 
 	public void verifyElementContainsText(WebElement we, String expLabel) {
-		logger.i("verifySelectedLabel, expLabel=%s", expLabel);
+
 		String actText = getText(we);
 		Assert.assertTrue(actText.contains(expLabel), "Expected String is not present");
 	}
 
 	public void verifyElementTextIsSubstring(WebElement we, String expLabel) {
-		logger.i("verifySelectedLabel, expLabel=%s", expLabel);
+
 		String actText = getText(we);
 
 		Assert.assertTrue(expLabel.contains(actText), "Expected String is not present");
 	}
 
 	public String alertGetMessage() {
-		logger.i("getAlertMessage");
+		System.out.println("getAlertMessage");
 		String msg = "";
 		try {
 			Alert alert = driver.switchTo().alert();
 			msg = alert.getText();
-			logger.d("getAlertMessage: %s", msg);
+
 		} catch (Exception e) {
-			logger.e(e);
+			System.err.println(e);
 		}
 
 		return msg;
@@ -772,13 +734,13 @@ public class BaseDriver {
 	}
 
 	public void verifyElementTextMatchesRegex(WebElement we, String regex) {
-		logger.i("verifyElementTextMatchesRegex, regex=%s", regex);
+
 		String actText = getText(we);
 		Assert.assertTrue(actText.matches(regex), "Actual String does not matches Regex");
 	}
 
 	public String[] getAllListItems(WebElement we) {
-		logger.i("getAllListItems");
+		System.out.println("getAllListItems");
 
 		Select select = new Select(we);
 		List<WebElement> options = select.getOptions();
@@ -788,37 +750,35 @@ public class BaseDriver {
 			val[j++] = weOption.getText();
 		}
 
-		logger.d("getAllListItems: %s", Utilities.getStringFromArray(val));
 
 		return val;
 	}
 
 	public void verifyAllListItems(WebElement we, String[] items) {
-		String expItemsStr = Utilities.getStringFromArray(items);
-		logger.i("verifyAllListItems: expItemsLen=%d, expItems=%s", items.length, expItemsStr);
+		String expItemsStr = FileConnector.getStringFromArray(items);
 		String[] actItems = getAllListItems(we);
 
 		Assert.assertEquals(actItems.length, items.length, "List items length mismatch!");
-		Assert.assertEquals(Utilities.getStringFromArray(actItems), expItemsStr, "List items mismatch!");
+		Assert.assertEquals(FileConnector.getStringFromArray(actItems), expItemsStr, "List items mismatch!");
 	}
 
 	public boolean isPresent(WebElement we) {
-		logger.i("isPresent");
+		System.out.println("isPresent");
 		boolean present = we.isDisplayed();
-		logger.d("isPresent: %s", present);
+
 		return present;
 	}
 
 	public String getTitle() {
-		logger.i("getTitle");
+		System.out.println("getTitle");
 		String actTitle = driver.getTitle();
-		logger.d("getTitle: %s", actTitle);
+
 		return actTitle;
 	}
 
 	public void waitForAlert() {
-		logger.i("waitForAlert");
-		
+		System.out.println("waitForAlert");
+
 		newWait.until(ExpectedConditions.alertIsPresent());
 	}
 
@@ -835,7 +795,7 @@ public class BaseDriver {
 				"Element text color mismatch! Expected:" + expcolor.toUpperCase() + "actual:" + hex.toUpperCase());
 
 	}
-	
+
 	public void verifyBackgroundColor(WebElement we, String expcolor) {
 		String color = we.getCssValue("background-color");
 		String[] numbers = color.replace("rgba(", "").replace(")", "").split(",");
@@ -849,23 +809,23 @@ public class BaseDriver {
 	}
 
 	public void verifyElementValueIsEmpty(WebElement we) {
-		logger.i("verifyElementValueIsEmpty");
+		System.out.println("verifyElementValueIsEmpty");
 		Assert.assertEquals(getValue(we), "", "Element '" + we + "' Value is not empty");
 	}
 
 	public void openDuplicateWindow() {
-		logger.i("openDuplicateWindow");
+		System.out.println("openDuplicateWindow");
 		((JavascriptExecutor) driver).executeScript("(window.open(document.URL))");
 	}
 
 	public void verifyTextBoxIsNotEditable(WebElement we) {
-		logger.i("verifyTextBoxIsNotEditable");
+		System.out.println("verifyTextBoxIsNotEditable");
 		String value = we.getAttribute("readonly");
 		Assert.assertTrue(value.contentEquals("true"), "Element '" + we + "' Is Editable");
 	}
 
 	public void verifyTextIsUnderLined(WebElement we) {
-		logger.i("verifyTextBoxIsNotEditable");
+		System.out.println("verifyTextBoxIsNotEditable");
 		String value = we.getAttribute("style");
 		Assert.assertTrue(value.contains("text-decoration: underline"),
 				"Text of Element '" + we + "' Is not Underlined");
@@ -873,12 +833,12 @@ public class BaseDriver {
 	}
 
 	public void uploadFile(WebElement we, String path) {
-		logger.i("uploadFile");
+		System.out.println("uploadFile");
 		we.sendKeys(path);
 	}
 
 	public void waitForElementTextNotEmpty(WebElement we) {
-		logger.i("waitForElementTextNotEmpty");
+		System.out.println("waitForElementTextNotEmpty");
 
 		int trials = 10;
 		int len;
@@ -887,7 +847,7 @@ public class BaseDriver {
 			String text = getText(we);
 			len = text.length();
 			if (trials != 10) {
-				logger.d("Waiting");
+				System.out.println("Waiting");
 				sleep(2000, "Requires time for text to be displayed");
 			}
 		} while (len <= 1 && --trials > 0);
@@ -895,7 +855,7 @@ public class BaseDriver {
 	}
 
 	public void waitForElementValueNotEmpty(WebElement we) {
-		logger.i("waitForElementValueNotEmpty");
+		System.out.println("waitForElementValueNotEmpty");
 
 		int trials = 10;
 		int len;
@@ -904,7 +864,7 @@ public class BaseDriver {
 			String text = getValue(we);
 			len = text.length();
 			if (trials != 10) {
-				logger.d("Waiting");
+				System.out.println("Waiting");
 				sleep(2000, "Requires time for text to be displayed");
 			}
 		} while (len <= 1 && --trials > 0);
@@ -912,12 +872,11 @@ public class BaseDriver {
 	}
 
 	public void clearText(WebElement we) {
-		logger.i("clearText");
+		System.out.println("clearText");
 		we.clear();
 	}
 
 	public void verifyElementContainsValue(WebElement we, String expLabel) {
-		logger.i("verifySelectedLabel, expLabel=%s", expLabel);
 
 		String actValue = getValue(we);
 		Assert.assertTrue(actValue.contains(expLabel), "Expected String is not present");
@@ -925,13 +884,13 @@ public class BaseDriver {
 	}
 
 	public void verifyElementValueNotEmpty(WebElement we) {
-		logger.i("verifyElementValueNotEmpty");
+		System.out.println("verifyElementValueNotEmpty");
 
 		Assert.assertNotEquals(getValue(we), "", "Element '" + we + "' Value is empty");
 	}
 
 	public void selectRadioButton(List<WebElement> weLst, int optionNo) {
-		logger.i("selectRadioButton");
+		System.out.println("selectRadioButton");
 		if (optionNo > 0 && optionNo <= weLst.size()) {
 			weLst.get(optionNo - 1).click();
 		} else {
@@ -940,7 +899,7 @@ public class BaseDriver {
 	}
 
 	public void verifySelectionBoxIsMultiple(String elementId) {
-		logger.i("verifyIsMultipleSelectionBox");
+		System.out.println("verifyIsMultipleSelectionBox");
 
 		Object isMultiple = ((JavascriptExecutor) driver)
 				.executeScript("return document.getElementById('" + elementId + "').multiple");
@@ -948,7 +907,7 @@ public class BaseDriver {
 	}
 
 	public int getselectedRadioButton(List<WebElement> weLst) {
-		logger.i("getselectedRadioButton");
+		System.out.println("getselectedRadioButton");
 
 		int optionNo = 0;
 		for (int i = 0; i <= weLst.size(); i++) {
@@ -962,19 +921,17 @@ public class BaseDriver {
 	}
 
 	public void verifyJSCondition(final String jsCondition, boolean status) {
-		logger.i("verifyJSCondition: %s", jsCondition);
 		Object ret = ((JavascriptExecutor) driver).executeScript("return " + jsCondition);
 		Assert.assertEquals(status, ret, "Status for jsCondition :" + jsCondition + " is not '" + status + "'");
 
 	}
 
 	public void executeJSCondition(final String jsCondition) {
-		logger.i("executeJSCondition: %s", jsCondition);
 		((JavascriptExecutor) driver).executeScript(jsCondition);
 	}
 
 	public void verifyScrollBarPresent(WebElement elementId) {
-		logger.i("verifyScrollBarPresent");
+		System.out.println("verifyScrollBarPresent");
 		String condition = "document.getElementById('" + elementId + "').scrollHeight > document.getElementById('"
 				+ elementId + "').clientHeight";
 		Object ret = ((JavascriptExecutor) driver).executeScript("return " + condition);
@@ -989,7 +946,7 @@ public class BaseDriver {
 	}
 
 	public void waitForChangeInLengthOfValue(final WebElement we, final int valueLen) {
-		logger.i("waitForChangeInLengthOfValue");
+		System.out.println("waitForChangeInLengthOfValue");
 
 		ExpectedCondition<Boolean> newWaitCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -1005,12 +962,11 @@ public class BaseDriver {
 	}
 
 	public void appendText(WebElement we, String text) {
-		logger.i("appendText, text=%s", text);
 		we.sendKeys(text);
 	}
 
 	public void verifyScrollBarNotPresent(String elementId) {
-		logger.i("verifyScrollBarPresent");
+		System.out.println("verifyScrollBarPresent");
 		String condition = "document.getElementById('" + elementId + "').scrollHeight > document.getElementById('"
 				+ elementId + "').clientHeight";
 		Object ret = ((JavascriptExecutor) driver).executeScript("return " + condition);
@@ -1020,7 +976,7 @@ public class BaseDriver {
 	public void waitForWindowToClose() {
 		final int windowCount = driver.getWindowHandles().size();
 
-		logger.i("waitForWindowToClose");
+		System.out.println("waitForWindowToClose");
 		if (windowCount > 1) {
 			ExpectedCondition<Boolean> windowClosedCondition = new ExpectedCondition<>() {
 				public Boolean apply(WebDriver driver) {
@@ -1032,7 +988,7 @@ public class BaseDriver {
 			newWait.until(windowClosedCondition);
 		}
 		switchToMainWindow();
-		
+
 
 	}
 
@@ -1040,7 +996,7 @@ public class BaseDriver {
 		boolean presentFlag = false;
 
 		try {
-			logger.i("isAlertPresent");
+			System.out.println("isAlertPresent");
 
 			if (newWait.until(ExpectedConditions.alertIsPresent()) != null) {
 				presentFlag = true;
@@ -1048,47 +1004,47 @@ public class BaseDriver {
 
 		} catch (NoAlertPresentException ex) {
 			// Alert not present
-			logger.e(ex);
+			System.err.println(ex);
 		}
 		return presentFlag;
 	}
 
 	public void selectByValue(WebElement we, String value) {
 		this.sleep(2000,"For showing case Create page");
-		logger.i("selectByValue, label=%s", value);
+
 		Select select = new Select(we);
 		select.selectByValue(value);
 	}
 
 	public void selectByVisibleText(WebElement we, String value) {
-		logger.i("selectByValue, label=%s", value);
+
 		Select select = new Select(we);
 		select.selectByVisibleText(value);
 	}
 
 	public void verifyIsEnabled(WebElement we) {
-		logger.i("verifyIsEnabled");
+		System.out.println("verifyIsEnabled");
 
 		Assert.assertTrue(isEnabled(we), "Element '" + we + "' is not enabled!");
 	}
 
 	public void verifyIsDisabled(WebElement we) {
-		logger.i("verifyIsDisabled");
+		System.out.println("verifyIsDisabled");
 		Assert.assertFalse(isEnabled(we), "Element '" + we + "' is not enabled!");
 	}
 
 	public boolean isEnabled(WebElement we) {
-		logger.i("isEnabled");
+		System.out.println("isEnabled");
 		return we.isEnabled();
 	}
 
 	public boolean isReadOnly(WebElement we) {
-		logger.i("isReadOnly");
+		System.out.println("isReadOnly");
 		return Boolean.parseBoolean(we.getAttribute("readonly"));
 	}
 
 	public boolean findElementByXpath(String object) {
-		logger.i("findElementByXpath");
+		System.out.println("findElementByXpath");
 		try {
 			driver.findElement(By.xpath(object));
 			return true;
@@ -1098,7 +1054,7 @@ public class BaseDriver {
 	}
 
 	public String getTextColor(WebElement we) {
-		logger.i("getTextColor");
+		System.out.println("getTextColor");
 		String color = we.getCssValue("color");
 
 		if (!color.contains("#")) {
@@ -1119,7 +1075,7 @@ public class BaseDriver {
 
 
 	public void moveOnElement(WebElement we) {
-		logger.i("moveOnElement "+we.getText());
+		System.out.println("moveOnElement "+we.getText());
 
 		Actions actions = new Actions(driver);
 		actions.moveToElement(we);
@@ -1128,7 +1084,7 @@ public class BaseDriver {
 	}
 
 	public WebElement FindElementByCss(String object) {
-		logger.i("findElementByCSS");
+		System.out.println("findElementByCSS");
 		try {
             return driver.findElement(By.cssSelector(object));
 		} catch (Exception e) {
@@ -1163,32 +1119,31 @@ public class BaseDriver {
 			for(WebElement DropDownItem:we){
 				if(DropDownItem.getText().trim().contains(selectItem)) {
 					Actions action = new Actions(driver);
-					logger.i("mouseHoverClickOnElement "+selectItem);
+					System.out.println("mouseHoverClickOnElement "+selectItem);
 					isitemGet=true;
 					action.moveToElement(DropDownItem).click().build().perform();
 					break;
 				}
 			}
-
 			if(!isitemGet) {
-				logger.e("Selected item is Not Found");
+				System.err.println("Selected item is Not Found");
 			}
-
+			
 		} catch (Exception e) {
 			Assert.fail(e.getMessage());
-			logger.e(e.getMessage());
+			System.err.println(e.getMessage());
 		}
 	}
-
+	
 	public void scrollHorizontalUntillElementIsView(WebElement ele) {
 		((JavascriptExecutor) driver).executeScript("window.scrollBy(1000,0)", ele);
-		logger.i("Scroll Horzontal");
+		System.out.println("Scroll Horzontal");
 		this.sleep(2000,"Element find");
 	}
 
 	public void scrollHorizontalUntillListElementsIsView(List<WebElement> eleList) {
 		((JavascriptExecutor) driver).executeScript("window.scrollBy(1000,0)", eleList);
-		logger.i("Scroll Horzontal");
+		System.out.println("Scroll Horzontal");
 		this.sleep(2000,"Element find");
 
 	}

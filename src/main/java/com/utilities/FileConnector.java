@@ -1,17 +1,15 @@
-package configuration;
+package com.utilities;
 
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class Utilities {
+public class FileConnector {
 
 	public static String getTimeStamp() {
 		return (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date());

@@ -1,8 +1,6 @@
-package pages;
+package com.configuration;
 
 
-import configuration.BaseDriver;
-import configuration.BaseTest;
 import org.openqa.selenium.support.PageFactory;
 
 public class AbstractionPOM extends BaseTest {
@@ -19,5 +17,4 @@ public class AbstractionPOM extends BaseTest {
 		// This initElements method will create all WebElements
 				PageFactory.initElements(baseDriver.driver, this);
 	}
-	
 }

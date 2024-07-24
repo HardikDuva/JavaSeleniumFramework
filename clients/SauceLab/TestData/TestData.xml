@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<TestData>
-    <UserDetails>
-        <UserName>standard_user</UserName>
-        <Password>secret_sauce</Password>
-    </UserDetails>
-</TestData>
