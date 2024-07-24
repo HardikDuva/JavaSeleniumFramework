@@ -17,14 +17,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.utilities.TestDataConstants.*;
+
 public class BaseTest {
 
 	protected BaseDriver baseDriver = null;
-	protected String testName = null;
-	protected static String clientName = null;
-	protected String browser = null;
+    protected static String clientName = null;
+	private String browser = null;
 	protected static String outputDirPath = null;
-
+	private String finalOutputReport = null;
 	public static ExtentReports extent;
 	protected ExtentTest test;
 
@@ -34,7 +35,7 @@ public class BaseTest {
 		this.browser = brw;
 		clientName = client;
 		outputDirPath = "." + File.separator + "TestResult" + File.separator + client
-				+ File.separator + FileConnector.getTimeStamp() + File.separator + browser ;
+				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + browser ;
 
 		try {
 			FrameworkConfig.init(System.getProperty("user.dir")
@@ -49,41 +50,29 @@ public class BaseTest {
 
 		try {
 			FileConnector.createDir(outputDirPath);
-			ExtentSparkReporter htmlReporter = new ExtentSparkReporter(outputDirPath
-					+ File.separator + "report.html");
+			finalOutputReport = outputDirPath
+					+ File.separator + "report.html";
+			ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
 			extent = new ExtentReports();
 			extent.attachReporter(htmlReporter);
 
 		} catch (Exception e) {
 			Assert.fail("Error while creating directory for extent report" + e.getMessage());
 		}
-
 	}
 
 	@BeforeMethod
 	public void launchBrowser(ITestResult result) {
-		int implicitTimeout = 0;
-		String serverURL = null;
-		String projectURL = null;
-		testName = result.getMethod().getMethodName();
+        String testName = result.getMethod().getMethodName();
 		test = extent.createTest(testName);
-
-		try {
-			implicitTimeout = Integer.parseInt(FrameworkConfig.get("WAIT_STANDARD"));
-			serverURL = FrameworkConfig.get("SERVER_URL");
-			projectURL = UserDetailsConfig.get("PRODUCT_URL");
-
-		} catch (Exception e) {
-			Assert.fail("Framework configuration file reading error" + e.getMessage());
-		}
 
 		// Open browser
 		try {
-			baseDriver = new BaseDriver(browser, serverURL,implicitTimeout);
-			baseDriver.gotoUrl(projectURL);
+			baseDriver = new BaseDriver(browser, SERVER_URL,WAIT_STANDARD);
+			baseDriver.gotoUrl(PRODUCT_URL);
 
 		} catch (Exception e) {
-			Assert.fail("Open browser failed!" + e.getMessage());
+			errorLog(test,"Open browser failed!" + e.getMessage());
 		}
 	}
 
@@ -97,6 +86,9 @@ public class BaseTest {
 	@AfterSuite
 	public void reportGenerated() throws IOException {
 		extent.flush();
+		if(SEND_EMAIL) {
+			sendEmail();
+		}
 	}
 
 	public LogInPage ObLogIn() {
@@ -110,6 +102,18 @@ public class BaseTest {
 	protected void errorLog(ExtentTest test, String msg) {
 		baseDriver.captureFailTestScreenshot(test,msg);
 		Assert.fail(msg);
+	}
+
+	public void sendEmail() {
+		//Send Report
+		EmailConnector emailConnector = new EmailConnector();
+		String subject = "Execution Report for the client " + clientName;
+		String bodyContent = "Please Find Attached Execution Report with" +
+				"\n Browser : " + browser +
+				"\n Time    : " + DateTimeConnector.getTimeStampWithLocaleEnglish();
+		File tempFile = new File(finalOutputReport);
+
+		emailConnector.sendEmailWithAttachment(EMAIL_TO,subject,bodyContent,tempFile);
 	}
 }
 	

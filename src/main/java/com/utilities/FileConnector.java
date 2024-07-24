@@ -5,15 +5,14 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FileConnector {
-
-	public static String getTimeStamp() {
-		return (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date());
-	}
 
 	/**
 	 * Create directory at specific path

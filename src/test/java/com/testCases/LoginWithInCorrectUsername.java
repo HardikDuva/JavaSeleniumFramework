@@ -5,18 +5,18 @@ import com.utilities.UserDetailsConfig;
 
 import org.testng.annotations.Test;
 
+import static com.utilities.TestDataConstants.HOME_PAGE_URL;
+import static com.utilities.TestDataConstants.PASSWORD;
+
 public class LoginWithInCorrectUsername extends BaseTest {
 
 	@Test
 	public void LoginInCheckWithIncorrectUsername() {
-		String password = UserDetailsConfig.get("Password");
-		String productExpURL = UserDetailsConfig.get("productHomePageURL");
-
 		ObLogIn().enterUsername("UserName")
-				.enterPassword(password)
+				.enterPassword(PASSWORD)
 				.clickOnLoginInButton();
 
-		if(ObLogIn().getPageURL().contains(productExpURL)) {
+		if(ObLogIn().getPageURL().contains(HOME_PAGE_URL)) {
 			errorLog(test,"User Logged-In Successfully even password is incorrect");
 		}
 		else {

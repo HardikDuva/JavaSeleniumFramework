@@ -5,26 +5,23 @@ import com.utilities.UserDetailsConfig;
 
 import org.testng.annotations.Test;
 
+import static com.utilities.TestDataConstants.*;
+
 public class LoginWithCorrectCredentials extends BaseTest {
 
 	@Test
 	public void LoginInWithCorrectCredential()  {
-		String username = UserDetailsConfig.get("UserName");
-		String password = UserDetailsConfig.get("Password");
-		String productExpURL = UserDetailsConfig.get("productHomePageURL");
-
-		ObLogIn().enterUsername(username)
-				.enterPassword(password)
+		ObLogIn().enterUsername(USERNAME)
+				.enterPassword(PASSWORD)
 				.clickOnLoginInButton();
 
-		if(ObLogIn().getPageURL().contains(productExpURL)) {
+		if(ObLogIn().getPageURL().contains(HOME_PAGE_URL)) {
 			infoLog(test,"User Logged-In Successfully");
 		}
 		else {
 			errorLog(test,"User is not logged In Successfully");
 		}
 	}
-
 }
 
 
