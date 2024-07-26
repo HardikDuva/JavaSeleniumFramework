@@ -11,6 +11,8 @@ import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.util.Properties;
 
+import static com.configuration.BaseTest.printMsgOnConsole;
+
 public class EmailConnector {
 
     /**
@@ -71,7 +73,7 @@ public class EmailConnector {
 
             // Send message
             Transport.send(message);
-            System.out.println("Sent email successfully....");
+            printMsgOnConsole("Sent email successfully....");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }

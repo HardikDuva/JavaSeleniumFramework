@@ -15,10 +15,10 @@ public class LoginWithCorrectCredentials extends ObjectRepo {
 				.clickOnLoginInButton();
 
 		if(ObLogIn().getPageURL().contains(HOME_PAGE_URL)) {
-			infoLog(test,"User Logged-In Successfully");
+			infoLog("User Logged-In Successfully");
 		}
 		else {
-			errorLog(test,"User is not logged In Successfully");
+			errorLog("User is not logged In Successfully");
 		}
 	}
 }

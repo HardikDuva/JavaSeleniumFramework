@@ -3,20 +3,14 @@ package com.configuration;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
-import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.utilities.*;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.testng.*;
 import org.testng.annotations.*;
-import com.pages.LogInPage;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static com.utilities.TestDataConstants.*;
 
@@ -24,19 +18,24 @@ public class BaseTest {
 
 	protected BaseDriver baseDriver = null;
     protected static String clientName = null;
-	private String browser = null;
+	private static String platform = null;
+	private static String device = null;
+	private static String browser = null;
 	protected static String outputDirPath = null;
 	private String finalOutputReport = null;
 	public static ExtentReports extent;
-	protected ExtentTest test;
+	protected ExtentTest extentTest;
 
     @BeforeSuite
-	@Parameters({"Browser" , "Client"})
-	public void setConfiguration(String brw,String client) {
-		this.browser = brw;
+	@Parameters({"Platform","Device","Browser","Client"})
+	public void setConfiguration(String pForm,String dwc,String brw,String client) {
+		platform = pForm;
+		device = dwc;
+		browser = brw;
 		clientName = client;
 		outputDirPath = "." + File.separator + "TestResult" + File.separator + client
-				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + browser ;
+				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + platform +
+				File.separator + device + File.separator + browser ;
 
 		try {
 			FrameworkConfig.init(System.getProperty("user.dir")
@@ -65,18 +64,35 @@ public class BaseTest {
 	@BeforeMethod
 	public void launchBrowser(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-		test = extent.createTest(testName);
+		extentTest = extent.createTest(testName);
 
+		WebDriver driver;
 		// Open browser
 		try {
-            RemoteWebDriver remoteWebDriver = new RemoteWebDriver(browser, SERVER_URL);
-			WebDriver driver = remoteWebDriver.launchBrowser();
+			infoLog("WebDriver is started initiating for the \n Platform : " + platform
+							+ " Device : " + device +
+					"\n Browser : " + browser);
+			if(platform.equalsIgnoreCase("windows")) {
+				RemoteWebDriverFactory remoteWebDriver = new RemoteWebDriverFactory();
+				driver = remoteWebDriver.launchBrowser(extentTest,device,browser, SERVER_URL);
+			}
+
+			else if (platform.equalsIgnoreCase("mobile")) {
+				RemoteMobileEmulatorDriver remoteMobileEmulatorDriver =
+						new RemoteMobileEmulatorDriver();
+				driver = remoteMobileEmulatorDriver.launchBrowser(extentTest,device,browser, SERVER_URL);
+			}
+
+			else {
+				RemoteWebDriverFactory remoteWebDriver = new RemoteWebDriverFactory();
+				driver = remoteWebDriver.launchBrowser(extentTest,device,browser, SERVER_URL);
+			}
 
 			baseDriver = new BaseDriver(driver,WAIT_STANDARD);
 			baseDriver.gotoUrl(PRODUCT_URL);
 
 		} catch (Exception e) {
-			errorLog(test,"Open browser failed!" + e.getMessage());
+			extentTest.log(Status.FAIL,"Open browser failed!" + e.getMessage());
 		}
 	}
 
@@ -88,19 +104,25 @@ public class BaseTest {
 	}
 
 	@AfterSuite
-	public void reportGenerated() throws IOException {
+	public void generateReport() throws IOException {
 		extent.flush();
 		if(SEND_EMAIL) {
 			sendEmail();
 		}
 	}
 
-	protected void infoLog(ExtentTest test, String msg) {
-		test.log(Status.INFO, msg);
+	protected void infoLog(String msg) {
+		printMsgOnConsole(msg);
+		extentTest.log(Status.INFO, msg);
 	}
 
-	protected void errorLog(ExtentTest test, String msg) {
-		baseDriver.captureFailTestScreenshot(test,msg);
+	protected void errorLog(String msg) {
+		if(baseDriver!=null) {
+			baseDriver.captureFailTestScreenshot(extentTest, msg);
+		}
+
+		printMsgOnConsole(msg);
+		extentTest.log(Status.FAIL,msg);
 		Assert.fail(msg);
 	}
 
@@ -115,6 +137,11 @@ public class BaseTest {
 
 		emailConnector.sendEmailWithAttachment(EMAIL_TO,subject,bodyContent,tempFile);
 	}
+
+	public static void printMsgOnConsole(String msg) {
+		System.out.println(msg);
+	}
+
 }
 	
 	

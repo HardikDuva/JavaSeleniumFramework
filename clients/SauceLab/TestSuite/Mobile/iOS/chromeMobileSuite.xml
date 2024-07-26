@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SauceLab" parallel="tests" thread-count="2">
+	<parameter name="Platform" value="Mobile"/>
+	<parameter name="Device" value="iPhone 12 Pro"/>
+	<parameter name="Browser" value="Chrome"/>
+	<parameter name="Client" value="SauceLab"/>
+	<test name="LoginWithCorrectCredentials">
+		<classes>
+			<class name="com.testCases.LoginWithCorrectCredentials" />
+		</classes> 
+	</test>
+	<test name="LoginWithInCorrectUsername">
+		<classes>
+			<class name="com.testCases.LoginWithInCorrectUsername" />
+		</classes>
+	</test>
+</suite> 

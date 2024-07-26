@@ -5,7 +5,7 @@ import com.pages.LogInPage;
 public class ObjectRepo extends BaseTest{
 
 	public LogInPage ObLogIn() {
-		return new LogInPage(baseDriver,test);
+		return new LogInPage(baseDriver,extentTest);
 	}
 
 }

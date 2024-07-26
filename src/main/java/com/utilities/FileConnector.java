@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.configuration.BaseTest.printMsgOnConsole;
+
 public class FileConnector {
 
 	/**
@@ -20,7 +22,7 @@ public class FileConnector {
 	public static void createDir(String directoryPath) {
 		File directory = new File(directoryPath);
 		if (!directory.exists()) {
-			System.out.println("Creating directory at " + directoryPath);
+			printMsgOnConsole("Creating directory at " + directoryPath);
 			directory.mkdirs();
 		}
 	}
@@ -45,7 +47,7 @@ public class FileConnector {
 				}
 			});
 		} catch (IOException e) {
-			System.out.println("-");
+			printMsgOnConsole("-");
 		}
 	}
 

@@ -28,11 +28,11 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage enterUsername(String userName) {
         try {
-            infoLog(test,"Enter Username :" + userName);
+            infoLog("Enter Username :" + userName);
             baseDriver.waitForElementVisible(usernameInputEle);
             baseDriver.inputText(usernameInputEle,userName);
         } catch (Exception e) {
-            errorLog(test,"Username field is not editable");
+            errorLog("Username field is not editable");
         }
         return this;
     }
@@ -42,11 +42,11 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage enterPassword(String password) {
         try {
-            infoLog(test,"Enter Password :" + password);
+            infoLog("Enter Password :" + password);
             baseDriver.waitForElementVisible(passwordInputEle);
             baseDriver.inputText(passwordInputEle,password);
         } catch (Exception e) {
-            errorLog(test,"Password field is not editable");
+            errorLog("Password field is not editable");
         }
         return this;
     }
@@ -56,10 +56,10 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage clickOnLoginInButton() {
         try {
-            infoLog(test,"Click on Login Button");
+            infoLog("Click on Login Button");
             baseDriver.clickAndWait(loginButtonClickEle);
         } catch (Exception e) {
-            errorLog(test,"Login Button field is not clickable");
+            errorLog("Login Button field is not clickable");
         }
         return this;
     }
@@ -69,7 +69,7 @@ public class LogInPage extends AbstractionPOM {
      */
     //will Navigate to Product URL Page
     public String getPageURL() {
-        infoLog(test,"Get Current Page URL");
+        infoLog("Get Current Page URL");
         return baseDriver.getCurrentUrl();
     }
 

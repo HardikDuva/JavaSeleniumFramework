@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static com.configuration.BaseTest.printMsgOnConsole;
+
 
 public final class FrameworkConfig {
 
@@ -30,7 +32,7 @@ public final class FrameworkConfig {
 	 */
 	public static void init(final String configFilePath) {
 		filePath = configFilePath;
-		System.out.println("File Path : ==== " + filePath);
+		printMsgOnConsole("File Path : ==== " + filePath);
 		loadFromFile();
 	}
 
@@ -44,7 +46,7 @@ public final class FrameworkConfig {
 					Files.newInputStream(
 							Paths.get(filePath)));
 		} catch (IOException e) {
-			System.out.println("Failed to load configuration file from path :"
+			printMsgOnConsole("Failed to load configuration file from path :"
                     + "\n"
 					+ filePath
 					+ "\n"

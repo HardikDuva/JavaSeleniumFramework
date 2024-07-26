@@ -9,7 +9,7 @@ public class AbstractionPOM extends BaseTest {
 	// Default constructor
 	public AbstractionPOM(BaseDriver baseDriver, ExtentTest test) {
 		this.baseDriver = baseDriver;
-		this.test = test;
+		this.extentTest = test;
 		// This initElements method will create all WebElements
 		PageFactory.initElements(baseDriver.driver, this);
 	}
