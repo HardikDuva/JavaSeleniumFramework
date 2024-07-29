@@ -8,6 +8,12 @@ public final class TestDataConstants {
 	private TestDataConstants() { }
 
 	/**
+	 * The Report Name
+	 */
+	public static final String REPORT_NAME
+			= FrameworkConfig.get("REPORT_NAME");
+
+	/**
 	 * The Selenium GRID URL used to route tests to waiting nodes.
 	 */
 	public static final String SERVER_URL

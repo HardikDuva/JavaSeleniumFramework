@@ -23,7 +23,7 @@ public class BaseTest {
 	private static String browser = null;
 	protected static String outputDirPath = null;
 	private String finalOutputReport = null;
-	public static ExtentReports extent;
+	public static ExtentReports extentReports;
 	protected ExtentTest extentTest;
 
     @BeforeSuite
@@ -51,14 +51,16 @@ public class BaseTest {
 		try {
 			FileConnector.createDir(outputDirPath);
 			finalOutputReport = outputDirPath
-					+ File.separator + "report.html";
+					+ File.separator + REPORT_NAME + ".html";
 			ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
-			extent = new ExtentReports();
-			extent.attachReporter(htmlReporter);
-			extent.setSystemInfo("Platform",platform);
-			extent.setSystemInfo("Device",device);
-			extent.setSystemInfo("Browser",browser);
-			extent.setSystemInfo("Client",clientName);
+			htmlReporter.config().setDocumentTitle(REPORT_NAME);
+			htmlReporter.config().setReportName(REPORT_NAME);
+			extentReports = new ExtentReports();
+			extentReports.attachReporter(htmlReporter);
+			extentReports.setSystemInfo("Platform",platform);
+			extentReports.setSystemInfo("Device",device);
+			extentReports.setSystemInfo("Browser",browser);
+			extentReports.setSystemInfo("Client",clientName);
 
 		} catch (Exception e) {
 			Assert.fail("Error while creating directory for extent report" + e.getMessage());
@@ -68,7 +70,7 @@ public class BaseTest {
 	@BeforeMethod
 	public void launchBrowser(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-		extentTest = extent.createTest(testName);
+		extentTest = extentReports.createTest(testName);
 
 		WebDriver driver;
 		// Open browser
@@ -109,7 +111,7 @@ public class BaseTest {
 
 	@AfterSuite
 	public void generateReport() throws IOException {
-		extent.flush();
+		extentReports.flush();
 		if(SEND_EMAIL) {
 			sendEmail();
 		}
