@@ -55,6 +55,10 @@ public class BaseTest {
 			ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
 			extent = new ExtentReports();
 			extent.attachReporter(htmlReporter);
+			extent.setSystemInfo("Platform",platform);
+			extent.setSystemInfo("Device",device);
+			extent.setSystemInfo("Browser",browser);
+			extent.setSystemInfo("Client",clientName);
 
 		} catch (Exception e) {
 			Assert.fail("Error while creating directory for extent report" + e.getMessage());
