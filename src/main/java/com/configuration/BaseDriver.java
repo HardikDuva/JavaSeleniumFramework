@@ -2,6 +2,8 @@ package com.configuration;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
+import com.utilities.DateTimeConnector;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -14,11 +16,13 @@ import org.openqa.selenium.support.ui.*;
 import org.testng.Assert;
 import com.utilities.FileConnector;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 
+import static com.configuration.BaseTest.outputDirPath;
 import static com.configuration.BaseTest.printMsgOnConsole;
 
 public class BaseDriver {
@@ -402,12 +406,21 @@ public class BaseDriver {
 		Assert.assertEquals(actValue, expValue, "Element value mismatch!");
 	}
 
-	public void captureFailTestScreenshot(ExtentTest test,String msg) {
+	public void captureFailTestScreenshot(ExtentTest extentTest,String msg) {
 		try {
-			String base64Screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BASE64);
-			test.addScreenCaptureFromBase64String(base64Screenshot, msg);
+			String directoryPath = outputDirPath +
+					File.separator + "ScreenShot";
+
+			FileConnector.createDir(directoryPath);
+			String relativePath = directoryPath + File.separator + FileConnector.getRandomInt(1,100)
+					+ "_" + DateTimeConnector.getTimeStamp() + "_.png";
+
+			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+			FileUtils.copyFile(screenshot, new File(relativePath));
+
+			extentTest.addScreenCaptureFromPath(relativePath);
 		} catch (Exception e) {
-			test.log(Status.FAIL, "Error while taking screenshot " + e.getMessage());
+			extentTest.log(Status.FAIL, "Error while taking screenshot " + e.getMessage());
 		}
 	}
 

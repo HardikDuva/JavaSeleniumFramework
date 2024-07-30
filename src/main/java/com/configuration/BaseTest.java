@@ -5,12 +5,16 @@ import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.utilities.*;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.testng.*;
 import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import static com.utilities.TestDataConstants.*;
 
@@ -33,13 +37,13 @@ public class BaseTest {
 		device = dwc;
 		browser = brw;
 		clientName = client;
-		outputDirPath = "." + File.separator + "TestResult" + File.separator + client
+		outputDirPath = System.getProperty("user.dir") + File.separator + "TestResult" + File.separator + client
 				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + platform +
 				File.separator + device + File.separator + browser ;
 
 		try {
 			FrameworkConfig.init(System.getProperty("user.dir")
-					+ "/src/test/java/resource/configuration/FW_Config.properties");
+					+ "/src/test/resource/configuration/FW_Config.properties");
 
 			UserDetailsConfig.init(System.getProperty("user.dir")
 					+ "/clients/" + clientName + "/TestData/TestData.properties");
@@ -122,9 +126,9 @@ public class BaseTest {
 		extentTest.log(Status.INFO, msg);
 	}
 
-	protected void errorLog(String msg) {
+	protected void errorLog(String msg){
 		if(baseDriver!=null) {
-			baseDriver.captureFailTestScreenshot(extentTest, msg);
+			baseDriver.captureFailTestScreenshot(extentTest,msg);
 		}
 
 		printMsgOnConsole(msg);
