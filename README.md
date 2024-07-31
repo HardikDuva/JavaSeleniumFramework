@@ -23,13 +23,13 @@ Make sure all the necessary data are there
 
 3. Write test case for Login Page(You can write test case for any page)
 
-4. Set-up Failed screenshot file folder path in BaseTest.java class
+4. If you want to update output folder path then change in Basetest.java class.(By default it's already set-up)
 
-5. Set-up AfterSuite method if you want to send execution report to email 
-  Add Email address and other required parameter
+5. Set-up SEND_EMAIL value as true in configuration fileif you want to send execution report to email 
+  Add Email address and other required parameter in configuration file.
    
 6. Run docker image according to requirnment (Command -> docker compose up)
 
 7. Run xml file from suite directory according to browser requirnment
 
-8. After run successfully you can find execution report in testOutput directory and failed TCS screenshot in "TestResult" directory.
+8. After run successfully you can find execution report in TestResult directory and for the failed TCS you can see attached image in execution report.
