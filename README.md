@@ -16,7 +16,7 @@
 ### Run your First Test
 1. Clone the Data-Drivern-Framework repository. 
 ```
-git clone https://github.com/HardikDuva/TestDrivenFramework.git and make sure all the dependency in pom.xml file are upto date
+git clone https://github.com/HardikDuva/JavaSeleniumFramework.git and make sure all the dependency in pom.xml file are upto date
 ```
 2. Set-up Test Data file and configuration fike
 Make sure all the necessary data are there
