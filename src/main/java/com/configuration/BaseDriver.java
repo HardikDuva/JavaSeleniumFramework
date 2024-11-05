@@ -19,11 +19,12 @@ import com.utilities.FileConnector;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 
-import static com.configuration.BaseTest.outputDirPath;
-import static com.configuration.BaseTest.printMsgOnConsole;
+import static com.configuration.BaseTest.*;
 
 public class BaseDriver {
 
@@ -406,14 +407,14 @@ public class BaseDriver {
 		Assert.assertEquals(actValue, expValue, "Element value mismatch!");
 	}
 
-	public void captureFailTestScreenshot(ExtentTest extentTest,String msg) {
+	public void captureFailTestScreenshot(ExtentTest extentTest) {
 		try {
-			String directoryPath = outputDirPath +
-					File.separator + "ScreenShot";
+			if (Files.notExists(Path.of(screenShotPath))) {
+				FileConnector.createDir(screenShotPath);
+			}
 
-			FileConnector.createDir(directoryPath);
-			String relativePath = directoryPath + File.separator + FileConnector.getRandomInt(1,100)
-					+ "_" + DateTimeConnector.getTimeStamp() + "_.png";
+			String relativePath = screenShotPath + File.separator +
+					FileConnector.getRandomInt(1,100) + ".png";
 
 			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 			FileUtils.copyFile(screenshot, new File(relativePath));

@@ -27,6 +27,7 @@ public class BaseTest {
 	private static String browser = null;
 	protected static String outputDirPath = null;
 	private String finalOutputReport = null;
+	protected static String screenShotPath = null;
 	public static ExtentReports extentReports;
 	protected ExtentTest extentTest;
 
@@ -40,6 +41,8 @@ public class BaseTest {
 		outputDirPath = System.getProperty("user.dir") + File.separator + "TestResult" + File.separator + client
 				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + platform +
 				File.separator + device + File.separator + browser ;
+
+		screenShotPath = outputDirPath + File.separator + "ScreenShot";
 
 		try {
 			FrameworkConfig.init(System.getProperty("user.dir")
@@ -56,15 +59,7 @@ public class BaseTest {
 			FileConnector.createDir(outputDirPath);
 			finalOutputReport = outputDirPath
 					+ File.separator + REPORT_NAME + ".html";
-			ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
-			htmlReporter.config().setDocumentTitle(REPORT_NAME);
-			htmlReporter.config().setReportName(REPORT_NAME);
-			extentReports = new ExtentReports();
-			extentReports.attachReporter(htmlReporter);
-			extentReports.setSystemInfo("Platform",platform);
-			extentReports.setSystemInfo("Device",device);
-			extentReports.setSystemInfo("Browser",browser);
-			extentReports.setSystemInfo("Client",clientName);
+			setExtentHtmlReportProperty();
 
 		} catch (Exception e) {
 			Assert.fail("Error while creating directory for extent report" + e.getMessage());
@@ -128,7 +123,7 @@ public class BaseTest {
 
 	protected void errorLog(String msg){
 		if(baseDriver!=null) {
-			baseDriver.captureFailTestScreenshot(extentTest,msg);
+			baseDriver.captureFailTestScreenshot(extentTest);
 		}
 
 		printMsgOnConsole(msg);
@@ -152,6 +147,18 @@ public class BaseTest {
 		System.out.println(msg);
 	}
 
+	private void setExtentHtmlReportProperty() {
+		ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
+		htmlReporter.config().setDocumentTitle(REPORT_NAME);
+		htmlReporter.config().setReportName(REPORT_NAME);
+		extentReports = new ExtentReports();
+		extentReports.attachReporter(htmlReporter);
+		extentReports.setSystemInfo("Platform",platform);
+		extentReports.setSystemInfo("Device",device);
+		extentReports.setSystemInfo("Browser",browser);
+		extentReports.setSystemInfo("Client",clientName);
+
+	}
 }
 	
 	
