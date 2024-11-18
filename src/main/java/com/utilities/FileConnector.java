@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static com.configuration.BaseTest.printMsgOnConsole;
+import static com.configuration.BaseDriver.printMsgOnConsole;
 
 public class FileConnector {
 

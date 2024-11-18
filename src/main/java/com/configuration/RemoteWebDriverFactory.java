@@ -12,7 +12,7 @@ import org.testng.Assert;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.configuration.BaseTest.printMsgOnConsole;
+import static com.configuration.BaseDriver.printMsgOnConsole;
 
 public class RemoteWebDriverFactory {
 

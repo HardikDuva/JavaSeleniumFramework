@@ -1,17 +1,15 @@
 package com.pages;
 
-import com.aventstack.extentreports.ExtentTest;
 import com.configuration.AbstractionPOM;
 import com.configuration.BaseDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import org.testng.Assert;
 
 public class LogInPage extends AbstractionPOM {
 
-    public LogInPage(BaseDriver baseDriver,ExtentTest test) {
-        super(baseDriver,test);
+    public LogInPage(BaseDriver baseDriver) {
+        super(baseDriver);
     }
 
     @FindBy(xpath = "//div[@class=\"login-box\"]//input[@id=\"user-name\"]")
@@ -28,11 +26,11 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage enterUsername(String userName) {
         try {
-            infoLog("Enter Username :" + userName);
+            baseDriver.infoLog("Enter Username :" + userName);
             baseDriver.waitForElementVisible(usernameInputEle);
             baseDriver.inputText(usernameInputEle,userName);
         } catch (Exception e) {
-            errorLog("Username field is not editable");
+            baseDriver.errorLog("Username field is not editable");
         }
         return this;
     }
@@ -42,11 +40,11 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage enterPassword(String password) {
         try {
-            infoLog("Enter Password :" + password);
+            baseDriver.infoLog("Enter Password :" + password);
             baseDriver.waitForElementVisible(passwordInputEle);
             baseDriver.inputText(passwordInputEle,password);
         } catch (Exception e) {
-            errorLog("Password field is not editable");
+            baseDriver.errorLog("Password field is not editable");
         }
         return this;
     }
@@ -56,10 +54,10 @@ public class LogInPage extends AbstractionPOM {
      */
     public LogInPage clickOnLoginInButton() {
         try {
-            infoLog("Click on Login Button");
+            baseDriver.infoLog("Click on Login Button");
             baseDriver.clickAndWait(loginButtonClickEle);
         } catch (Exception e) {
-            errorLog("Login Button field is not clickable");
+            baseDriver.errorLog("Login Button field is not clickable");
         }
         return this;
     }
@@ -69,7 +67,7 @@ public class LogInPage extends AbstractionPOM {
      */
     //will Navigate to Product URL Page
     public String getPageURL() {
-        infoLog("Get Current Page URL");
+        baseDriver.infoLog("Get Current Page URL");
         return baseDriver.getCurrentUrl();
     }
 

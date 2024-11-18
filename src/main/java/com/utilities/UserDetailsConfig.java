@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import static com.configuration.BaseTest.printMsgOnConsole;
+import static com.configuration.BaseDriver.printMsgOnConsole;
 
 public final class UserDetailsConfig {
 

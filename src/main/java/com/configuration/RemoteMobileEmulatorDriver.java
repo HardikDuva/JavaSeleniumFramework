@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import static com.configuration.BaseTest.printMsgOnConsole;
+import static com.configuration.BaseDriver.printMsgOnConsole;
 
 public class RemoteMobileEmulatorDriver {
 

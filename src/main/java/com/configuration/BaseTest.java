@@ -16,20 +16,19 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import static com.configuration.BaseDriver.printMsgOnConsole;
 import static com.utilities.TestDataConstants.*;
 
 public class BaseTest {
 
 	protected BaseDriver baseDriver = null;
-    protected static String clientName = null;
+    private static String clientName = null;
 	private static String platform = null;
 	private static String device = null;
 	private static String browser = null;
-	protected static String outputDirPath = null;
-	private String finalOutputReport = null;
+    private static String reportDirectory = null;
 	protected static String screenShotPath = null;
 	public static ExtentReports extentReports;
-	protected ExtentTest extentTest;
 
     @BeforeSuite
 	@Parameters({"Platform","Device","Browser","Client"})
@@ -38,9 +37,9 @@ public class BaseTest {
 		device = dwc;
 		browser = brw;
 		clientName = client;
-		outputDirPath = System.getProperty("user.dir") + File.separator + "TestResult" + File.separator + client
-				+ File.separator + DateTimeConnector.getTimeStamp() + File.separator + platform +
-				File.separator + device + File.separator + browser ;
+        String outputDirPath = System.getProperty("user.dir") + File.separator + "TestResult" + File.separator + client
+                + File.separator + DateTimeConnector.getTimeStamp() + File.separator + platform +
+                File.separator + device + File.separator + browser;
 
 		screenShotPath = outputDirPath + File.separator + "ScreenShot";
 
@@ -57,7 +56,7 @@ public class BaseTest {
 
 		try {
 			FileConnector.createDir(outputDirPath);
-			finalOutputReport = outputDirPath
+			reportDirectory = outputDirPath
 					+ File.separator + REPORT_NAME + ".html";
 			setExtentHtmlReportProperty();
 
@@ -69,12 +68,12 @@ public class BaseTest {
 	@BeforeMethod
 	public void launchBrowser(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-		extentTest = extentReports.createTest(testName);
+		ExtentTest extentTest = extentReports.createTest(testName);
 
 		WebDriver driver;
 		// Open browser
 		try {
-			infoLog("WebDriver is started initiating for the \n Platform : " + platform
+			extentTest.log(Status.INFO,"WebDriver is started initiating for the \n Platform : " + platform
 							+ " Device : " + device +
 					"\n Browser : " + browser);
 			if(platform.equalsIgnoreCase("windows")) {
@@ -93,11 +92,11 @@ public class BaseTest {
 				driver = remoteWebDriver.launchBrowser(extentTest,device,browser, SERVER_URL);
 			}
 
-			baseDriver = new BaseDriver(driver,WAIT_STANDARD);
+			baseDriver = new BaseDriver(driver,extentTest,WAIT_STANDARD);
 			baseDriver.gotoUrl(PRODUCT_URL);
 
 		} catch (Exception e) {
-			extentTest.log(Status.FAIL,"Open browser failed!" + e.getMessage());
+			baseDriver.errorLog("Open browser failed!" + e.getMessage());
 		}
 	}
 
@@ -116,21 +115,6 @@ public class BaseTest {
 		}
 	}
 
-	protected void infoLog(String msg) {
-		printMsgOnConsole(msg);
-		extentTest.log(Status.INFO, msg);
-	}
-
-	protected void errorLog(String msg){
-		if(baseDriver!=null) {
-			baseDriver.captureFailTestScreenshot(extentTest);
-		}
-
-		printMsgOnConsole(msg);
-		extentTest.log(Status.FAIL,msg);
-		Assert.fail(msg);
-	}
-
 	private void sendEmail() {
 		//Send Report
 		EmailConnector emailConnector = new EmailConnector();
@@ -138,17 +122,13 @@ public class BaseTest {
 		String bodyContent = "Please Find Attached Execution Report with" +
 				"\n Browser : " + browser +
 				"\n Time    : " + DateTimeConnector.getTimeStampWithLocaleEnglish();
-		File tempFile = new File(finalOutputReport);
+		File tempFile = new File(reportDirectory);
 
 		emailConnector.sendEmailWithAttachment(EMAIL_TO,subject,bodyContent,tempFile);
 	}
 
-	public static void printMsgOnConsole(String msg) {
-		System.out.println(msg);
-	}
-
 	private void setExtentHtmlReportProperty() {
-		ExtentSparkReporter htmlReporter = new ExtentSparkReporter(finalOutputReport);
+		ExtentSparkReporter htmlReporter = new ExtentSparkReporter(reportDirectory);
 		htmlReporter.config().setDocumentTitle(REPORT_NAME);
 		htmlReporter.config().setReportName(REPORT_NAME);
 		extentReports = new ExtentReports();

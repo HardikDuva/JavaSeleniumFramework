@@ -32,9 +32,11 @@ public class BaseDriver {
 	private final long limit;
 	private String mainWindowHandle = null;
 	protected Wait<WebDriver> newWait;
+	public ExtentTest extentTest;
 
-	public BaseDriver(WebDriver driver, long newWaitImplicit) {
+	public BaseDriver(WebDriver driver,ExtentTest extentTest, long newWaitImplicit) {
 		this.driver = driver;
+		this.extentTest = extentTest;
 		this.limit = newWaitImplicit;
 		this.newWait = setWait();
 		mainWindowHandle = driver.getWindowHandle();
@@ -127,7 +129,6 @@ public class BaseDriver {
 	}
 
 	public void clickAndWait(WebElement we) {
-
 		printMsgOnConsole("Click On " + we);
 		clickAndWait(we, true);
 	}
@@ -1066,5 +1067,21 @@ public class BaseDriver {
 		catch (Exception e){
 			return false;
 		}
+	}
+
+	public void infoLog(String msg) {
+		printMsgOnConsole(msg);
+		extentTest.log(Status.INFO, msg);
+	}
+
+	public void errorLog(String msg){
+		captureFailTestScreenshot(extentTest);
+		printMsgOnConsole(msg);
+		extentTest.log(Status.FAIL,msg);
+		Assert.fail(msg);
+	}
+
+	public static void printMsgOnConsole(String msg) {
+		System.out.println(msg);
 	}
 }
