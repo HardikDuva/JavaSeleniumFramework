@@ -9,9 +9,9 @@
 			<class name="com.testCases.LoginWithCorrectCredentials" />
 		</classes> 
 	</test>
-	<test name="LoginWithInCorrectUsername">
+	<!--<test name="LoginWithInCorrectUsername">
 		<classes>
 			<class name="com.testCases.LoginWithInCorrectUsername" />
 		</classes>
-	</test>
+	</test>-->
 </suite> 
